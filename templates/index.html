@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+
+<section class="estadisticas">
+    <div class="tarjeta">
+        <h3>{{ total }}</h3>
+        <p>Contactos</p>
+    </div>
+    <div class="tarjeta">
+        <h3>{{ favs }}</h3>
+        <p>Favoritos ⭐</p>
+    </div>
+    <div class="tarjeta">
+        <h3>{{ familias }}</h3>
+        <p>Familia</p>
+    </div>
+    <div class="tarjeta">
+        <h3>{{ escuelas }}</h3>
+        <p>Escuela</p>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>➕ Agregar contacto</h2>
+
+    <form action="{{ url_for('agregar') }}" method="POST">
+        <input type="text" name="nombre" placeholder="Nombre completo" required>
+        <input type="tel" name="telefono" placeholder="Teléfono" required>
+        <input type="email" name="correo" placeholder="Correo electrónico">
+
+        <select name="categoria" required>
+            <option value="">Selecciona categoría</option>
+            <option>Familia</option>
+            <option>Amigos</option>
+            <option>Escuela</option>
+            <option>Trabajo</option>
+            <option>Otros</option>
+        </select>
+
+        <label>Fecha de cumpleaños</label>
+        <input type="date" name="cumpleanos">
+
+        <textarea name="notas" placeholder="Notas adicionales"></textarea>
+
+        <button type="submit">Guardar contacto</button>
+    </form>
+</section>
+
+{% with mensajes = get_flashed_messages(with_categories=true) %}
+    {% for categoria_msg, mensaje in mensajes %}
+        <p class="mensaje">{{ mensaje }}</p>
+    {% endfor %}
+{% endwith %}
+
+<section class="panel">
+    <h2>📒 Mis contactos</h2>
+
+    <form method="GET" action="{{ url_for('inicio') }}">
+        <input type="search" name="q" value="{{ q }}"
+               placeholder="Buscar contacto...">
+
+        <select name="categoria">
+            <option value="">Todas las categorías</option>
+            <option value="Familia">Familia</option>
+            <option value="Amigos">Amigos</option>
+            <option value="Escuela">Escuela</option>
+            <option value="Trabajo">Trabajo</option>
+            <option value="Otros">Otros</option>
+        </select>
+
+        <button type="submit">Buscar</button>
+        <a href="{{ url_for('inicio') }}">Limpiar</a>
+    </form>
+
+    <p>
+        <a href="{{ url_for('inicio', favoritos=1) }}">⭐ Ver favoritos</a>
+        |
+        <a href="{{ url_for('exportar') }}">📥 Exportar contactos</a>
+    </p>
+
+    {% if contactos %}
+        {% for contacto in contactos %}
+        <article class="contacto">
+            <h3>
+                {{ contacto.nombre }}
+                {% if contacto.favorito == 1 %} ⭐ {% endif %}
+            </h3>
+
+            <p>📞 {{ contacto.telefono }}</p>
+            <p>✉️ {{ contacto.correo or 'Sin correo' }}</p>
+            <p>📁 {{ contacto.categoria }}</p>
+
+            {% if contacto.cumpleanos %}
+                <p>🎂 {{ contacto.cumpleanos }}</p>
+            {% endif %}
+
+            {% if contacto.notas %}
+                <p>📝 {{ contacto.notas }}</p>
+            {% endif %}
+
+            <a href="tel:{{ contacto.telefono }}">Llamar</a>
+
+            <a href="{{ url_for('editar', id=contacto.id) }}">Editar</a>
+
+            <form action="{{ url_for('favorito', id=contacto.id) }}"
+                  method="POST">
+                <button type="submit">⭐ Favorito</button>
+            </form>
+
+            <form action="{{ url_for('eliminar', id=contacto.id) }}"
+                  method="POST"
+                  onsubmit="return confirm('¿Eliminar este contacto?')">
+                <button type="submit">🗑️ Eliminar</button>
+            </form>
+        </article>
+        {% endfor %}
+    {% else %}
+        <p>No hay contactos registrados.</p>
+    {% endif %}
+</section>
+
+{% endblock %}
