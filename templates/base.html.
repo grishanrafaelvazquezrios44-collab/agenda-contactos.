@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactly 2.0</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+</head>
+<body>
+
+    <header class="encabezado">
+        <h1>📱 Contactly</h1>
+        <p>Tu agenda de contactos inteligente</p>
+    </header>
+
+    <main class="contenedor">
+        {% block contenido %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>Contactly 2.0 | Agenda de contactos</p>
+    </footer>
+
+</body>
+</html>
